@@ -1,0 +1,10 @@
+{
+  "appId": "com.joblog.app",
+  "appName": "Job Log",
+  "webDir": "www",
+  "android": { "allowMixedContent": false },
+  "server": { "androidScheme": "https" },
+  "plugins": {
+    "LocalNotifications": { "iconColor": "#1E6B4A" }
+  }
+}

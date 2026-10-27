@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1E6B4A">
+<title>Job Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Firebase setup -->
+<section id="setup" class="screen" hidden>
+  <div class="card">
+    <h1>Job Log</h1>
+    <p>Connect your Firebase project once on this device. Paste the <code>firebaseConfig</code> block from Firebase → Project settings → Your apps.</p>
+    <label for="cfgText">Firebase config</label>
+    <textarea id="cfgText" rows="8" placeholder='const firebaseConfig = {
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
+  appId: "..."
+};'></textarea>
+    <p class="err" id="cfgErr" hidden></p>
+    <button class="primary" id="cfgSave" type="button">Connect</button>
+  </div>
+</section>
+
+<!-- Sign in -->
+<section id="auth" class="screen" hidden>
+  <form class="card" id="authForm" autocomplete="on">
+    <h1>Job Log</h1>
+    <p>Sign in with the same email on your phone and your computer to share one list.</p>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="email" required>
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" minlength="6" required>
+    <p class="err" id="authErr" hidden></p>
+    <button class="primary" type="submit" id="signInBtn">Sign in</button>
+    <div class="row">
+      <button class="link" type="button" id="createBtn">Create account</button>
+      <button class="link" type="button" id="resetBtn">Forgot password</button>
+    </div>
+    <button class="link small" type="button" id="changeProject">Use a different Firebase project</button>
+  </form>
+</section>
+
+<!-- Main app -->
+<section id="main" hidden>
+  <div class="wrap">
+    <header>
+      <h1>Job Log</h1>
+      <div class="hright">
+        <div class="sync" id="sync"><span class="dot"></span><span id="syncText">Connecting…</span></div>
+        <button class="icon" id="menuBtn" type="button" aria-haspopup="true" aria-expanded="false">Account</button>
+      </div>
+    </header>
+    <div class="menu" id="menu" hidden>
+      <div class="who" id="who"></div>
+      <button class="icon" id="signOut" type="button">Sign out</button>
+    </div>
+
+    <div class="stats" aria-label="Summary">
+      <div class="stat"><b id="sOpen">0</b><span>To do</span></div>
+      <div class="stat"><b id="sToday">0</b><span>Done today</span></div>
+      <div class="stat"><b id="sWeek">0</b><span>Done this week</span></div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tabTodo" aria-selected="true">To do<span class="n" id="nTodo">0</span></button>
+      <button class="tab" role="tab" id="tabDone" aria-selected="false">Done log<span class="n" id="nDone">0</span></button>
+    </div>
+
+    <div id="view"></div>
+  </div>
+
+  <div class="bar">
+    <form id="addForm" autocomplete="off">
+      <div class="addrow">
+        <input id="newTitle" type="text" placeholder="Add a job…" maxlength="200" aria-label="New job">
+        <button type="submit" class="add">Add</button>
+      </div>
+      <div class="optrow">
+        <button type="button" class="flag" id="flagBtn" aria-pressed="false">! Urgent</button>
+        <label class="due"><span>Due</span><input id="newDue" type="datetime-local" aria-label="Due date and time"></label>
+      </div>
+    </form>
+  </div>
+  <div class="toast" id="toast" hidden><span id="toastText"></span><button id="toastUndo" type="button">Undo</button></div>
+</section>
+
+<script src="config.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
