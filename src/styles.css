@@ -21,9 +21,10 @@
   --body:"Onest","Segoe UI",system-ui,-apple-system,sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
   --r:16px; --r-sm:11px;
+  --ltime:#0E7A57; --toast-btn:#7FD3AF;
   color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root{
+:root[data-theme="dark"]{
   --bg:#0A100D; --surface:#111916; --surface-2:#18221E; --raise:#2A3832;
   --ink:#E9F0EC; --ink-2:#AAB7B0; --ink-3:#6E7C75; --line:#1F2A26; --line-2:#2B3833;
   --accent:#36D39A; --accent-press:#5FE0B1; --accent-ink:#03140C; --accent-soft:#103428; --accent-soft-ink:#7BE6BF;
@@ -31,7 +32,16 @@
   --brand:#36D39A; --brand-ink:#04150D; --brand-line:#0E5E42; --brand-dot:#F4C64E;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px -14px rgba(0,0,0,.7);
   --shadow-lg:0 -18px 48px -16px rgba(0,0,0,.8);
-  color-scheme:dark}}
+  --ltime:#7BE6BF; --toast-btn:#5FE0B1; color-scheme:dark}
+@media (prefers-color-scheme:dark){:root[data-theme="system"]{
+  --bg:#0A100D; --surface:#111916; --surface-2:#18221E; --raise:#2A3832;
+  --ink:#E9F0EC; --ink-2:#AAB7B0; --ink-3:#6E7C75; --line:#1F2A26; --line-2:#2B3833;
+  --accent:#36D39A; --accent-press:#5FE0B1; --accent-ink:#03140C; --accent-soft:#103428; --accent-soft-ink:#7BE6BF;
+  --urgent:#FF7B63; --urgent-soft:#3A1913; --due:#EDB65A; --due-soft:#33270F;
+  --brand:#36D39A; --brand-ink:#04150D; --brand-line:#0E5E42; --brand-dot:#F4C64E;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px -14px rgba(0,0,0,.7);
+  --shadow-lg:0 -18px 48px -16px rgba(0,0,0,.8);
+  --ltime:#7BE6BF; --toast-btn:#5FE0B1; color-scheme:dark}}
 
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -176,8 +186,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.
 .timeline{list-style:none;margin:0;padding:0}
 .log{display:grid;grid-template-columns:70px 22px 1fr;align-items:start;cursor:pointer;border-radius:12px}
 .log:hover .lt{color:var(--ink)}
-.ltime{font:500 13px var(--mono);color:var(--accent-soft-ink);text-align:right;padding:13px 0 0;font-variant-numeric:tabular-nums;white-space:nowrap}
-@media (prefers-color-scheme:light){.ltime{color:var(--accent)}}
+.ltime{font:500 13px var(--mono);color:var(--ltime);text-align:right;padding:13px 0 0;font-variant-numeric:tabular-nums;white-space:nowrap}
 .rail{position:relative;align-self:stretch;display:flex;justify-content:center}
 .rail::before{content:"";position:absolute;top:0;bottom:0;width:2px;background:var(--line)}
 .log:first-child .rail::before{top:18px}
@@ -235,8 +244,7 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.
 
 /* ---------- Toast ---------- */
 .toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:40;background:var(--ink);color:var(--bg);padding:11px 8px 11px 16px;border-radius:14px;font-size:14px;font-weight:500;display:flex;gap:6px;align-items:center;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);max-width:calc(100% - 32px);animation:toastin .25s cubic-bezier(.3,.7,.3,1.2)}
-.toast button{appearance:none;border:0;background:none;color:var(--brand-line);font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer}
-@media (prefers-color-scheme:dark){.toast button{color:var(--accent-press)}.toast{color:var(--bg)}}
+.toast button{appearance:none;border:0;background:none;color:var(--toast-btn);font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer}
 @keyframes toastin{from{transform:translate(-50%,12px);opacity:0}}
 
 @media (prefers-reduced-motion:no-preference){
@@ -245,3 +253,10 @@ h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media (max-width:380px){.top h1{font-size:32px}.ringwrap{width:96px;height:96px}.ringtxt b{font-size:28px}}
+
+/* Appearance picker */
+.appear{padding:12px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.appear b{font-weight:600;font-size:15px}
+.appear .seg3{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:var(--surface-2);border-radius:12px;padding:4px}
+.appear .seg3 button{appearance:none;border:0;background:none;border-radius:9px;padding:9px 6px;font-weight:600;font-size:14px;color:var(--ink-2);cursor:pointer}
+.appear .seg3 button[aria-pressed="true"]{background:var(--raise);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}

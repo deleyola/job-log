@@ -94,7 +94,7 @@ let auth, fs, user = null, unsub = null, tasks = new Map();
 let unlocked = false, lastCreds = null, bioAvail = false;
 
 async function boot() {
-  applyStatusBar();
+  applyTheme();
   if (isNative) {
     try { bioAvail = (await NativeBiometric.isAvailable()).isAvailable; } catch (e) { bioAvail = false; }
     App.addListener("pause", () => { pausedAt = Date.now(); });
@@ -117,17 +117,24 @@ async function boot() {
 }
 let pausedAt = Date.now();
 
-/* ---------- Status bar ---------- */
-function applyStatusBar() {
+/* ---------- Theme & status bar ---------- */
+const darkMQ = matchMedia("(prefers-color-scheme: dark)");
+const themePref = () => { const t = pref.get("theme", "light"); return ["light", "dark", "system"].includes(t) ? t : "light"; };
+const isDark = () => themePref() === "dark" || (themePref() === "system" && darkMQ.matches);
+function applyTheme() {
+  document.documentElement.setAttribute("data-theme", themePref());
+  const dark = isDark(), bg = dark ? "#0A100D" : "#F3F5F1";
+  $("themeColor").setAttribute("content", bg);
+  document.querySelectorAll("[data-theme-opt]").forEach(b => b.setAttribute("aria-pressed", b.dataset.themeOpt === themePref()));
   if (!isNative) return;
-  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
   try {
     StatusBar.setOverlaysWebView({ overlay: false });
-    StatusBar.setBackgroundColor({ color: dark ? "#0A100D" : "#F3F5F1" });
+    StatusBar.setBackgroundColor({ color: bg });
     StatusBar.setStyle({ style: dark ? Style.Dark : Style.Light });
   } catch (e) {}
 }
-matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", applyStatusBar);
+darkMQ.addEventListener?.("change", applyTheme);
+document.querySelectorAll("[data-theme-opt]").forEach(b => b.onclick = () => { pref.set("theme", b.dataset.themeOpt); applyTheme(); buzz(); });
 
 /* ---------- Lock ---------- */
 function showLock() {

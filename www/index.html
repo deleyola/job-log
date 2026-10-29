@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#F3F5F1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0B110F" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F3F5F1" id="themeColor">
+<script>try{var t=JSON.parse(localStorage.getItem("joblog.theme"));if(t==="dark"||t==="system")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <title>Job Log</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -156,6 +156,14 @@
   <div class="sheet" id="account" role="dialog" aria-modal="true" aria-labelledby="accTitle" hidden>
     <div class="grab"></div>
     <div class="acchead"><div class="avatar big"><span id="accAvatar">·</span></div><div><h3 id="accTitle">Account</h3><p class="sub" id="accEmail"></p></div></div>
+    <div class="appear">
+      <b>Appearance</b>
+      <div class="seg3" role="group" aria-label="Appearance">
+        <button type="button" data-theme-opt="light">Light</button>
+        <button type="button" data-theme-opt="dark">Dark</button>
+        <button type="button" data-theme-opt="system">Match phone</button>
+      </div>
+    </div>
     <label class="switchrow" for="bioToggle" id="bioRow" hidden>
       <span><b>Fingerprint unlock</b><small>Ask for your fingerprint when the app opens, and sign in with it after signing out.</small></span>
       <input id="bioToggle" type="checkbox" class="switch">

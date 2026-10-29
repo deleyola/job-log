@@ -37,7 +37,7 @@ jobs:
           npx cap add android
           npx --yes @capacitor/assets@3.0.5 generate --android \
             --iconBackgroundColor '#0E3B2C' --iconBackgroundColorDark '#0E3B2C' \
-            --splashBackgroundColor '#F3F5F1' --splashBackgroundColorDark '#0A100D'
+            --splashBackgroundColor '#F3F5F1' --splashBackgroundColorDark '#F3F5F1'
           MAN=android/app/src/main/AndroidManifest.xml
           for P in POST_NOTIFICATIONS USE_BIOMETRIC SCHEDULE_EXACT_ALARM; do
             grep -q "permission.$P\"" "$MAN" || sed -i "s#</manifest>#    <uses-permission android:name=\"android.permission.$P\" />\n</manifest>#" "$MAN"
