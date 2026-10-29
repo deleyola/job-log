@@ -3,92 +3,185 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1E6B4A">
+<meta name="theme-color" content="#F3F5F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B110F" media="(prefers-color-scheme: dark)">
 <title>Job Log</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="app.css">
 </head>
 <body>
 
-<!-- Firebase setup -->
-<section id="setup" class="screen" hidden>
-  <div class="card">
-    <h1>Job Log</h1>
-    <p>Connect your Firebase project once on this device. Paste the <code>firebaseConfig</code> block from Firebase → Project settings → Your apps.</p>
-    <label for="cfgText">Firebase config</label>
-    <textarea id="cfgText" rows="8" placeholder='const firebaseConfig = {
-  apiKey: "...",
-  authDomain: "...",
-  projectId: "...",
-  appId: "..."
-};'></textarea>
-    <p class="err" id="cfgErr" hidden></p>
-    <button class="primary" id="cfgSave" type="button">Connect</button>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-logo" viewBox="0 0 48 48"><rect width="48" height="48" rx="14" fill="var(--brand)"/><path d="M13 23.5l6.5 6.5L35 14.5" fill="none" stroke="var(--brand-ink)" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 36h12" stroke="var(--brand-line)" stroke-width="3.4" stroke-linecap="round"/><circle cx="33" cy="36" r="2.4" fill="var(--brand-dot)"/></symbol>
+    <symbol id="i-check" viewBox="0 0 20 20"><path d="M5 10.5l3.2 3.2L15 6.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.8V8l2.2 1.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 16 16"><path d="M4 14V2.8M4 3h7.2l-1.6 2.8L11.2 8.6H4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-finger" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6.2 7.2A7.5 7.5 0 0 1 19.5 12v1.2"/><path d="M4.6 11.2A7.5 7.5 0 0 1 5 9.6"/><path d="M8.4 20.2a12 12 0 0 0 1.1-5.4V12a2.5 2.5 0 0 1 5 0v1.6"/><path d="M12 12v2.4a15 15 0 0 1-1.7 7"/><path d="M16.9 15.6a17 17 0 0 1-1.2 5.2"/><path d="M7 12a5 5 0 0 1 10 0v.8"/><path d="M5.2 15.8A14 14 0 0 0 7 13"/></g></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></g></symbol>
+    <symbol id="i-cloud" viewBox="0 0 16 16"><path d="M4.6 12.5h7a2.9 2.9 0 0 0 .4-5.8 4 4 0 0 0-7.7-.9A3.4 3.4 0 0 0 4.6 12.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- Fingerprint lock -->
+<section id="lock" class="screen center" hidden>
+  <div class="lockbox">
+    <svg class="logo xl"><use href="#i-logo"/></svg>
+    <h2>Job Log is locked</h2>
+    <p class="sub" id="lockWho"></p>
+    <button class="btn primary wide" id="unlockBtn" type="button"><svg class="ic"><use href="#i-finger"/></svg>Unlock with fingerprint</button>
+    <button class="btn ghost" id="lockSignOut" type="button">Sign in with password instead</button>
   </div>
 </section>
 
 <!-- Sign in -->
-<section id="auth" class="screen" hidden>
-  <form class="card" id="authForm" autocomplete="on">
-    <h1>Job Log</h1>
-    <p>Sign in with the same email on your phone and your computer to share one list.</p>
-    <label for="email">Email</label>
-    <input id="email" type="email" autocomplete="email" required>
-    <label for="password">Password</label>
-    <input id="password" type="password" autocomplete="current-password" minlength="6" required>
-    <p class="err" id="authErr" hidden></p>
-    <button class="primary" type="submit" id="signInBtn">Sign in</button>
-    <div class="row">
-      <button class="link" type="button" id="createBtn">Create account</button>
-      <button class="link" type="button" id="resetBtn">Forgot password</button>
-    </div>
-    <button class="link small" type="button" id="changeProject">Use a different Firebase project</button>
-  </form>
-</section>
+<section id="auth" class="screen center" hidden>
+  <div class="authwrap">
+    <div class="brand"><svg class="logo lg"><use href="#i-logo"/></svg><span>Job Log</span></div>
+    <form class="authcard" id="authForm" name="login" method="post" action="#" autocomplete="on">
+      <h2 id="authTitle">Welcome back</h2>
+      <p class="sub" id="authSub">Sign in to see your jobs on this device.</p>
 
-<!-- Main app -->
-<section id="main" hidden>
-  <div class="wrap">
-    <header>
-      <h1>Job Log</h1>
-      <div class="hright">
-        <div class="sync" id="sync"><span class="dot"></span><span id="syncText">Connecting…</span></div>
-        <button class="icon" id="menuBtn" type="button" aria-haspopup="true" aria-expanded="false">Account</button>
+      <button class="btn bio wide" id="bioSignIn" type="button" hidden><svg class="ic"><use href="#i-finger"/></svg><span>Sign in with fingerprint</span></button>
+      <div class="or" id="bioOr" hidden><span>or use your password</span></div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="username" type="email" inputmode="email" autocomplete="username" autocapitalize="off" spellcheck="false" required>
       </div>
-    </header>
-    <div class="menu" id="menu" hidden>
-      <div class="who" id="who"></div>
-      <button class="icon" id="signOut" type="button">Sign out</button>
-    </div>
-
-    <div class="stats" aria-label="Summary">
-      <div class="stat"><b id="sOpen">0</b><span>To do</span></div>
-      <div class="stat"><b id="sToday">0</b><span>Done today</span></div>
-      <div class="stat"><b id="sWeek">0</b><span>Done this week</span></div>
-    </div>
-
-    <div class="tabs" role="tablist">
-      <button class="tab" role="tab" id="tabTodo" aria-selected="true">To do<span class="n" id="nTodo">0</span></button>
-      <button class="tab" role="tab" id="tabDone" aria-selected="false">Done log<span class="n" id="nDone">0</span></button>
-    </div>
-
-    <div id="view"></div>
-  </div>
-
-  <div class="bar">
-    <form id="addForm" autocomplete="off">
-      <div class="addrow">
-        <input id="newTitle" type="text" placeholder="Add a job…" maxlength="200" aria-label="New job">
-        <button type="submit" class="add">Add</button>
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="pw">
+          <input id="password" name="password" type="password" autocomplete="current-password" minlength="6" required>
+          <button type="button" class="pwtoggle" id="pwToggle" aria-label="Show password" aria-pressed="false"><svg class="ic"><use href="#i-eye"/></svg></button>
+        </div>
       </div>
-      <div class="optrow">
-        <button type="button" class="flag" id="flagBtn" aria-pressed="false">! Urgent</button>
-        <label class="due"><span>Due</span><input id="newDue" type="datetime-local" aria-label="Due date and time"></label>
+
+      <label class="switchrow" for="keep">
+        <span><b>Keep me signed in</b><small>Stay signed in on this device until you sign out.</small></span>
+        <input id="keep" type="checkbox" class="switch" checked>
+      </label>
+
+      <p class="msg" id="authErr" role="alert" hidden></p>
+      <button class="btn primary wide" type="submit" id="submitBtn">Sign in</button>
+      <div class="authfoot">
+        <button class="link" type="button" id="modeBtn">New here? Create an account</button>
+        <button class="link muted" type="button" id="resetBtn">Forgot password?</button>
       </div>
     </form>
   </div>
-  <div class="toast" id="toast" hidden><span id="toastText"></span><button id="toastUndo" type="button">Undo</button></div>
+</section>
+
+<!-- App -->
+<section id="main" hidden>
+  <div class="shell">
+    <aside class="side">
+      <header class="top">
+        <div>
+          <div class="eyebrow" id="weekday">Today</div>
+          <h1 id="dateTitle">Job Log</h1>
+        </div>
+        <button class="avatar" id="avatarBtn" type="button" aria-label="Account"><span id="avatarTxt">·</span></button>
+      </header>
+
+      <div class="summary" aria-label="Today's progress">
+        <div class="ringwrap">
+          <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="50" class="ring-track"/>
+            <circle cx="60" cy="60" r="50" class="ring-fill" id="ringFill" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
+          </svg>
+          <div class="ringtxt"><b id="sToday">0</b><span>done today</span></div>
+        </div>
+        <div class="sumright">
+          <div class="sumline"><b id="sOpen">0</b> left to do</div>
+          <div class="sumline"><b id="sOverdue" class="od">0</b> overdue</div>
+          <div class="sumline"><b id="sWeek">0</b> done this week</div>
+          <div class="week" id="week" aria-label="Jobs done each day this week"></div>
+        </div>
+      </div>
+      <div class="sync" id="sync"><svg class="ic"><use href="#i-cloud"/></svg><span id="syncText">Connecting…</span></div>
+    </aside>
+
+    <main class="content">
+      <div class="seg" role="tablist" aria-label="View">
+        <button role="tab" id="tabTodo" aria-selected="true">To do <span class="cnt" id="nTodo">0</span></button>
+        <button role="tab" id="tabDone" aria-selected="false">Done log <span class="cnt" id="nDone">0</span></button>
+        <span class="seg-pill" aria-hidden="true"></span>
+      </div>
+      <div id="view"></div>
+    </main>
+  </div>
+
+  <button class="fab" id="fab" type="button" aria-label="Add a job"><svg class="ic"><use href="#i-plus"/></svg><span>New job</span></button>
+
+  <!-- Composer -->
+  <div class="scrim" id="scrim" hidden></div>
+  <div class="sheet" id="composer" role="dialog" aria-modal="true" aria-labelledby="compTitle" hidden>
+    <div class="grab"></div>
+    <form id="compForm" autocomplete="off">
+      <div class="sheethead">
+        <h3 id="compTitle">New job</h3>
+        <button class="btn ghost sm" type="button" id="compClose">Cancel</button>
+      </div>
+      <textarea id="compText" rows="2" maxlength="200" placeholder="What needs doing?" aria-label="Job"></textarea>
+      <div class="chiprow" role="group" aria-label="Priority">
+        <button type="button" class="chip urg" id="compUrgent" aria-pressed="false"><svg class="ic"><use href="#i-flag"/></svg>Urgent</button>
+      </div>
+      <div class="lbl">Due</div>
+      <div class="chiprow" id="dueChips" role="group" aria-label="Due"></div>
+      <div class="dtrow" id="dtRow" hidden><input id="compDue" type="datetime-local" aria-label="Due date and time"></div>
+      <p class="duenote" id="dueNote"></p>
+      <div class="sheetfoot">
+        <button type="button" class="btn danger ghost" id="compDelete" hidden>Delete</button>
+        <button type="submit" class="btn primary" id="compSave">Add job</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Action sheet (done items) -->
+  <div class="sheet" id="actions" role="dialog" aria-modal="true" hidden>
+    <div class="grab"></div>
+    <p class="actitle" id="actTitle"></p>
+    <p class="sub" id="actSub"></p>
+    <div class="actlist">
+      <button class="btn soft wide" id="actUndo" type="button">Move back to To do</button>
+      <button class="btn danger ghost wide" id="actDelete" type="button">Delete from log</button>
+    </div>
+  </div>
+
+  <!-- Account -->
+  <div class="sheet" id="account" role="dialog" aria-modal="true" aria-labelledby="accTitle" hidden>
+    <div class="grab"></div>
+    <div class="acchead"><div class="avatar big"><span id="accAvatar">·</span></div><div><h3 id="accTitle">Account</h3><p class="sub" id="accEmail"></p></div></div>
+    <label class="switchrow" for="bioToggle" id="bioRow" hidden>
+      <span><b>Fingerprint unlock</b><small>Ask for your fingerprint when the app opens, and sign in with it after signing out.</small></span>
+      <input id="bioToggle" type="checkbox" class="switch">
+    </label>
+    <label class="switchrow" for="remindToggle" id="remindRow" hidden>
+      <span><b>Due-time reminders</b><small>A notification on this phone when a job is due.</small></span>
+      <input id="remindToggle" type="checkbox" class="switch" checked>
+    </label>
+    <button class="btn soft wide" id="signOutBtn" type="button">Sign out</button>
+    <p class="ver">Job Log 2.0</p>
+  </div>
+
+  <!-- Fingerprint offer -->
+  <div class="sheet" id="bioOffer" role="dialog" aria-modal="true" hidden>
+    <div class="grab"></div>
+    <div class="offer"><span class="offericon"><svg class="ic"><use href="#i-finger"/></svg></span>
+      <h3>Use your fingerprint?</h3>
+      <p class="sub">Unlock Job Log with a touch. Your password is saved securely on this phone, protected by your fingerprint.</p>
+    </div>
+    <div class="actlist">
+      <button class="btn primary wide" id="bioYes" type="button">Turn on fingerprint</button>
+      <button class="btn ghost wide" id="bioNo" type="button">Not now</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" hidden><span id="toastText"></span><button id="toastUndo" type="button">Undo</button></div>
 </section>
 
 <script src="config.js"></script>

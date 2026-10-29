@@ -12,9 +12,13 @@ A to-do list that keeps a dated log of finished jobs. One list, synced between a
 
 Every push to `main` rebuilds both.
 
-## First run (each device)
-1. Paste your Firebase `firebaseConfig` block and tap **Connect**. To skip this step everywhere, put the config in `www/config.js` instead.
-2. On the first device tap **Create account**. On every other device, **Sign in** with the same email and password.
+## Signing in
+- The Firebase config is built in (`www/config.js`), so there is nothing to paste.
+- **Keep me signed in** (on by default) keeps you signed in until you sign out.
+- **Desktop:** Chrome and Edge offer to save your password after you sign in.
+- **Android:** after your first sign-in the app offers fingerprint unlock. Your password is stored in the phone's secure keystore, unlocked by your fingerprint.
+
+The APK is signed with the fixed key in `signing/`, so each new build installs over the previous one.
 
 ## Firebase rules
 ```

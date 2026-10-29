@@ -35,10 +35,19 @@ jobs:
       - name: Create Android project
         run: |
           npx cap add android
-          # Android 13+ needs this permission to show reminders
+          npx --yes @capacitor/assets@3.0.5 generate --android \
+            --iconBackgroundColor '#0E3B2C' --iconBackgroundColorDark '#0E3B2C' \
+            --splashBackgroundColor '#F3F5F1' --splashBackgroundColorDark '#0A100D'
           MAN=android/app/src/main/AndroidManifest.xml
-          grep -q POST_NOTIFICATIONS "$MAN" || sed -i 's#</manifest>#    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />\n</manifest>#' "$MAN"
+          for P in POST_NOTIFICATIONS USE_BIOMETRIC SCHEDULE_EXACT_ALARM; do
+            grep -q "permission.$P\"" "$MAN" || sed -i "s#</manifest>#    <uses-permission android:name=\"android.permission.$P\" />\n</manifest>#" "$MAN"
+          done
+          sed -i "s/versionCode [0-9]*/versionCode ${{ github.run_number }}/; s/versionName \"[^\"]*\"/versionName \"2.0.${{ github.run_number }}\"/" android/app/build.gradle
           npx cap sync android
+      - name: Use the permanent signing key (so updates install over the old app)
+        run: |
+          mkdir -p ~/.android
+          cp signing/debug.keystore ~/.android/debug.keystore
       - name: Build APK
         working-directory: android
         run: |
